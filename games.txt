@@ -1,0 +1,2 @@
+{"time":"Tue Mar 08 01:35:05 CST 2016","creator":"Javier","attempts":0,"solutions":["","","","",""],"bestplayers":["","","","",""]}
+{"time":"Tue Mar 08 01:35:05 CST 2016","creator":"Ernesto","attempts":0,"solutions":["","","","",""],"bestplayers":["","","","",""]}
