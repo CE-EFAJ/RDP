@@ -7,13 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.google.gson.Gson;
 
 public class JsonFile {
-	private String ruta= "games.txt";
+	private String ruta;
 	private File file=null;
 	private FileWriter writer=null;
 	private FileReader reader=null;
@@ -22,7 +22,8 @@ public class JsonFile {
 	private Gson gson=null;
 	private PrintWriter pwriter;
 	
-	public JsonFile(){
+	public JsonFile(String ruta){
+		this.ruta=ruta;
 		gson = new Gson();
 		
 	}
@@ -53,8 +54,8 @@ public class JsonFile {
 		
 		
 	}
-	public void WriteClass(Game game){
-		String json= gson.toJson(game);
+	public void WriteClass(Object object){
+		String json= gson.toJson(object);
 		System.out.println(json);
 		Write(json);
 	}
@@ -67,17 +68,18 @@ public class JsonFile {
 	}
 	public void CloseFile(){
 		try {
-		bwriter.close();
+			if(bwriter!=null){
+		bwriter.close();}
 	} catch (IOException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
-	}
-	pwriter.close();
+	}if(pwriter!=null){
+	pwriter.close();}
 	}
 	
 	public List<String> Read(){
 		String linea = null;
-		List<String> lista = new ArrayList<String>();
+		List<String> lista = new LinkedList<String>();
         try {
 			while((linea=breader.readLine())!=null){
 			   System.out.println(linea);

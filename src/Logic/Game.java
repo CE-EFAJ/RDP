@@ -1,8 +1,9 @@
 package Logic;
 import java.util.Calendar;
+import java.util.List;
 
 public class Game {
-	private Regex regex= new Regex();
+	
 	private String pattern;
 	private String time;
 	private String creator="";
@@ -10,6 +11,7 @@ public class Game {
 	private int attempts=0;
 	private String[] examples= {"","","","",""};
 	private String[] bestplayers= {"","","","",""};
+	private Regex regex= new Regex();
 	
 	public Game(String pattern,String time,String creator,String number,int attempts, String[] examples,String[] bestplayers){
 		this.pattern=pattern;
@@ -23,8 +25,10 @@ public class Game {
 	
 	public Game(String creator,String pattern){
 		this.pattern=pattern;
-		time = Calendar.getInstance().getTime().toString();
+		this.time = Calendar.getInstance().getTime().toString();
 		this.creator=creator;
+		generateExamples();
+		this.number=generateNumber();
 		
 	}
 	
@@ -58,6 +62,33 @@ public class Game {
 		}
 		
 	}
+	
+	public String generateNumber(){
+		JsonFile genNumber=new JsonFile("genNumber.txt");
+		genNumber.OpenFile("read");
+		List<String> number=genNumber.Read();
+		if(number.isEmpty()){
+			genNumber.CloseFile();
+			genNumber.OpenFile("write");
+			genNumber.Write("0");
+			genNumber.CloseFile();
+			return "0";
+		}
+		else{
+			
+			String num=number.get(0);
+			genNumber.CloseFile();
+			int next = (Integer.parseInt(num)) + 1;
+			num=Integer.toString(next);
+			genNumber.OpenFile("write");
+			genNumber.Write(num);
+			genNumber.CloseFile();
+			
+			return num;
+		}
+		
+	}
+	
 	
 	public void plusAttempts(){
 		this.attempts++;
