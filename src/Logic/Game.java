@@ -9,11 +9,11 @@ public class Game {
 	private String creator="";
 	private String number="0";
 	private int attempts=0;
-	private String[] examples= {"","","","",""};
+	private Soluciones examples=new Soluciones();
 	private String[] bestplayers= {"","","","",""};
 	private Regex regex= new Regex();
 	
-	public Game(String pattern,String time,String creator,String number,int attempts, String[] examples,String[] bestplayers){
+	public Game(String pattern,String time,String creator,String number,int attempts, Soluciones examples,String[] bestplayers){
 		this.pattern=pattern;
 		this.time=time;
 		this.creator=creator;
@@ -33,18 +33,30 @@ public class Game {
 	}
 	
 	public void generateExamples(){
+		
+		String[] sol = new String[5];
 		for(int i=0; i<5;i++){
-		examples[i]= regex.Generator(pattern);}
+		sol[i]= regex.Generator(pattern);}
+		examples.setSoluciones(sol);
 	}
 	
-	public void changeExample(int index){
-		examples[index]=regex.Generator(pattern);
+	public Soluciones changeExample(Soluciones sol){
+		String [] change= sol.getSoluciones();
+		for(int i=0;i<5;i++){
+			if(sol.getCambios()[i]==true){
+				change[i]=regex.Generator(pattern);
+			}
+		}
+		
+		examples.setSoluciones(change);
+		Soluciones.noCambio();
+		return examples;
 	}
 	
 	public int validateSolution(String solution){
 		int percent=0;
 		for(int i=0;i<5;i++){
-			if(regex.Validate(solution, examples[i]));{
+			if(regex.Validate(solution, (examples.getSoluciones())[i]));{
 			percent++;
 			}
 		}
@@ -114,7 +126,7 @@ public class Game {
 		return attempts;
 	}
 
-	public String[] getExamples() {
+	public Soluciones getExamples() {
 		return examples;
 	}
 

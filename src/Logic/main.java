@@ -17,18 +17,18 @@ public class main {
 		//Boolean c= a.Validate(regex, example);
 		//System.out.println(b);
 		//Date G=Calendar.getInstance().getTime();
-		
+		//a.connectedUser("Javier");
 		//System.out.println(G.toString());
 		/*JsonFile f = new JsonFile("users.txt");
 		Game juego= new Game("Javier","AB");
 		Game game1= new Game("Ernesto","(AB)*");*/
-		int n=0;
+		/*int n=0;
 		while(n<10){
 		a.NewGame("Javier", "(AB)*+(A+C)(F+G)*X?");
 		a.NewGame("Ernesto", "(AB)*");
 		n++;}
 		a.SaveGames();
-		a.LoadGames();
+		a.LoadGames();*/
 		//a.DeleteGame("0");
 		//a.SaveGames();
 		

@@ -1,5 +1,6 @@
 package Logic;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,6 +10,11 @@ public class Foo {
 	private JsonFile gameFile=new JsonFile("games.txt");
 	private List<User> users=new ArrayList<User>();
 	private JsonFile userFile= new JsonFile("users.txt");
+	
+	public Foo(){
+		LoadGames();
+		LoadUsers();
+	}
 	
 	public void NewGame(String creator, String pattern){
 		games.add(new Game(creator,pattern));
@@ -28,7 +34,7 @@ public class Foo {
 		gameFile.OpenFile("read");
 		List<String> lista = gameFile.Read();
 		gameFile.CloseFile();
-		if(lista.isEmpty()|lista.get(0)==""){}
+		if(lista.isEmpty()/*|lista.get(0)==""*/){System.out.println("no hay Juegos");}
 		else{
 			int n=0;
 			while(n!=lista.size()){
@@ -54,7 +60,7 @@ public class Foo {
 		userFile.OpenFile("read");
 		List<String> lista = userFile.Read();
 		userFile.CloseFile();
-		if(lista.isEmpty()& lista.get(0)!=""){}
+		if(lista.isEmpty()/*& lista.get(0)!=""*/){System.out.println("no hay usuarios");}
 		else{
 			int n=0;
 			while(n!=lista.size()){
@@ -88,37 +94,81 @@ public class Foo {
 		Game gameTested=getGame(numGame);
 		if(gameTested!=null){
 			for(int i=0;i<5;i++){
-				String conca=solutions[i] + gameTested.getExamples()[i];
+				String conca=solutions[i] + gameTested.getExamples().getSoluciones()[i];
 				if(regex.Validate(gameTested.getPattern(), conca)){}
 				else{
 					return false;
-					//add + attempts
 				}
 				gameTested.plusAttempts();
 			}
+			DeleteGame(numGame);
+			SetNotify(numGame,nameUser,"1",Arrays.toString(solutions));
 			return true;
 			
 		}
 		return false;
 	}
 	
+	private void SetNotify(String numGame, String nameUser, String metodo, String solution) {
+		String message= "El juego #"+numGame+ "fue solucionado por "+nameUser+"mediante el metodo "+metodo+
+				" y la(s) solucion(es): " +solution+".";
+		getUser(getGame(numGame).getCreator()).AddMessage(message);
+		
+		
+		
+	}
+
 	public boolean IsCorrectMode2(String numGame, String nameUser, String solution){
 		Game gameTested=getGame(numGame);
 		if(gameTested!=null){
 			if(gameTested.validateSolution(solution)==5){
+				DeleteGame(numGame);
+				SetNotify(numGame,nameUser,"2",solution);
 				return true;
 			}
 			if(gameTested.validateSolution(solution)==4){
-				gameTested.addPlayers(nameUser);
-				gameTested.plusAttempts();
+				getGame(numGame).addPlayers(nameUser);
+				getGame(numGame).plusAttempts();
 				return false;
 			}
 			else{
-				gameTested.plusAttempts();
+				getGame(numGame).plusAttempts();
 				return false;
 			}
 		}
 		return false;
+	}
+	
+	public User getUser(String userName){
+		for(int i=0; i<users.size();i++){
+			if(users.get(i).getName()==userName){
+				return users.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public void newUser(String userName){
+		users.add(new User(userName));
+	}
+	
+	public String connectedUser(String userName){
+		User cUser = getUser(userName);
+		if(cUser!=null){
+			if(cUser.HaveMessages()){
+				getUser(userName).setNotify(false);
+				return userFile.getGson().toJson(cUser.getMessages());
+			}
+			return "no message";
+		}
+		newUser(userName);
+		return "";
+	}
+	
+	public Soluciones changeExample(Soluciones Sol){
+		getGame(Sol.getIdGame()).changeExample(Sol);
+		return getGame(Sol.getIdGame()).getExamples();
+		
 	}
 }
 	

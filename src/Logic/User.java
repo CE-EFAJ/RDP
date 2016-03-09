@@ -20,12 +20,19 @@ public class User {
 		this.name=name;
 	}
 	
+	public List<String> getMessages() {
+		return messages;
+	}
+
 	public void AddMessage(String text){
 		messages.add(text);
+		notify=true;
 	}
-	public void deleteMessages(){
+	public void setNotify(Boolean notify) {
 		messages.clear();
+		this.notify = notify;
 	}
+
 	public Boolean HaveMessages(){
 		return notify;
 	}
