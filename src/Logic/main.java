@@ -31,6 +31,11 @@ public class main {
 		a.LoadGames();*/
 		//a.DeleteGame("0");
 		//a.SaveGames();
+		//a.newUser("Astorga");
+		a.NewGame("Astorga", "(A+B)*A(B*A)?");
+		//a.getUser("Astorga").AddMessage("Un juego tuyo a sido terminado");
+		//a.SaveUsers();
+		//a.SaveGames();
 		
 		/*a.OpenFile("write");
 		User us1=new User("Javier");

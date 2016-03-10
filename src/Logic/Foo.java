@@ -1,35 +1,68 @@
 package Logic;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
+import Arduino.Arduino; 
 public class Foo {
+	private Arduino arduino=new Arduino();
 	private Regex regex=new Regex();
 	private List<Game> games=new LinkedList<Game>();
 	private JsonFile gameFile=new JsonFile("games.txt");
 	private List<User> users=new ArrayList<User>();
 	private JsonFile userFile= new JsonFile("users.txt");
 	
+	/**Constructor
+	 * Carga los juegos y usuarios de los archivos en disco
+	 * 
+	 */
+	
 	public Foo(){
 		LoadGames();
 		LoadUsers();
 	}
 	
-	public void NewGame(String creator, String pattern){
-		games.add(new Game(creator,pattern));
+	/**
+	 * Crea un nuevo juego y lo agrega a la lista de juegos
+	 * Guarda los juegos activos en disco
+	 * 
+	 * @param creator :nombre de usuario del creador del juego
+	 * @param pattern :expresion regular a adivinar
+	 * @throws IOException 
+	 * @throws InterruptedException 
+	 */
+	public Boolean NewGame(String creator, String pattern) throws InterruptedException, IOException{
+		if(regex.IsARegex(pattern)){
+			arduino.writeData(creator, 4);
+			games.add(new Game(creator,pattern));
+			SaveGames();
+		return true;
+		}
+		return false;
 	}
 	
-	public void DeleteGame(String number){
+	/**
+	 * Una vez que el juego se crea este tiene un numero unico
+	 * para eliminar el juego de la lista de juegos se inserta ese numero
+	 * Actualiza el archivo en disco.
+	 * 
+	 * @param number :numero asociado al juego que se desea eliminar
+	 */
+	private void DeleteGame(String number){
 		for(int i=0;i<games.size();i++){
 			if(number==games.get(i).getNumber()){
-				games.remove(i);			
+				games.remove(i);
+				SaveGames();
 				break;
 			}
 		}
 	}
 	
-	public void LoadGames(){
+	/**
+	 * Carga los juegos del archivo en disco
+	 */
+	private void LoadGames(){
 		games.clear();
 		gameFile.OpenFile("read");
 		List<String> lista = gameFile.Read();
@@ -43,7 +76,10 @@ public class Foo {
 			}
 		}
 	
-	public void SaveGames(){
+	/**
+	 * Guarda los juegos activos en disco
+	 */
+	private void SaveGames(){
 		gameFile.OpenFile("write");
 		if(games.isEmpty()){}
 		else{
@@ -55,7 +91,10 @@ public class Foo {
 		gameFile.CloseFile();
 		}
 	
-	public void LoadUsers(){
+	/**
+	 * Carga los usuarios del archivo en disco
+	 */
+	private void LoadUsers(){
 		users.clear();
 		userFile.OpenFile("read");
 		List<String> lista = userFile.Read();
@@ -69,7 +108,11 @@ public class Foo {
 			}
 		}
 	
-	public void SaveUsers(){
+	
+	/**
+	 * Guarda los usuarios actuales en disco
+	 */
+	private void SaveUsers(){
 		userFile.OpenFile("write");
 		if(users.isEmpty()){}
 		else{
@@ -81,7 +124,13 @@ public class Foo {
 		userFile.CloseFile();
 		}
 	
-	public Game getGame(String numGame){
+	/**
+	 * Solicita un juego especifico a la lista de juegos con el numero del juego
+	 * 
+	 * @param numGame :numero del juego que se desea obtener
+	 * @return Retorna el Game, asociado al numGame solicitado, para usar posteriormente
+	 */
+	private Game getGame(String numGame){
 		for(int i=0; i<games.size();i++){
 			if(games.get(i).getNumber()==numGame){
 				return games.get(i);
@@ -89,18 +138,40 @@ public class Foo {
 		}
 		return null;
 	}
-
-	public boolean IsCorrectMode1(String numGame, String nameUser, String[] solutions){
+	
+	/**
+	 * Modo 1: Corresponde al modo de solucion donde el usuario, participante del juego,
+	 * tiene que realizar una continuacion en cada una de las 5 soluciones creadas por el regex
+	 * a descubrir.
+	 * La funcion recibe un array de soluciones (continuaciones de los patrones generados por el creador)
+	 * valida si cada continuacion corresponde al patron creado.
+	 * Si el usuario logra realizar la continuacion del patron de las 5 soluciones, gano el juego por 
+	 * el modo 1, retorna un true añade un mensaje de notificacion al usuario creador del patron y
+	 * borra el juego de la lista de juegos
+	 * Si el usuario falla el juego, se le suma 1 al contador de intentos del juego,
+	 * 
+	 * 
+	 * @param numGame :numero del juego a vencer
+	 * @param nameUser :nombre del usuario que intenta completar el juego
+	 * @param solutions :Arreglo de soluciones creadas por el jugador
+	 * @return : True: si el juego se completa, False: si el juego falla
+	 * @throws IOException 
+	 * @throws InterruptedException 
+	 */
+	public boolean IsCorrectMode1(String numGame, String nameUser, String[] solutions) throws InterruptedException, IOException{
 		Game gameTested=getGame(numGame);
 		if(gameTested!=null){
 			for(int i=0;i<5;i++){
 				String conca=solutions[i] + gameTested.getExamples().getSoluciones()[i];
 				if(regex.Validate(gameTested.getPattern(), conca)){}
 				else{
+					arduino.writeData(nameUser, 2);
+					gameTested.plusAttempts();
 					return false;
 				}
-				gameTested.plusAttempts();
+				
 			}
+			arduino.writeData(nameUser, 3);
 			DeleteGame(numGame);
 			SetNotify(numGame,nameUser,"1",Arrays.toString(solutions));
 			return true;
@@ -109,37 +180,65 @@ public class Foo {
 		return false;
 	}
 	
+	/**
+	 * Añade una notificacion (mensaje) al usuario creador del juego que se logro vencer
+	 * @param numGame :numero del juego terminado
+	 * @param nameUser :nombre del usuario ganador
+	 * @param metodo :metodo por el que fue completado
+	 * @param solution :Solucion(es) que uso el jugador para completar el juego
+	 */
 	private void SetNotify(String numGame, String nameUser, String metodo, String solution) {
 		String message= "El juego #"+numGame+ "fue solucionado por "+nameUser+"mediante el metodo "+metodo+
 				" y la(s) solucion(es): " +solution+".";
 		getUser(getGame(numGame).getCreator()).AddMessage(message);
-		
-		
-		
 	}
 
-	public boolean IsCorrectMode2(String numGame, String nameUser, String solution){
+	/**
+	 * Modo 2: El usuario participante debera generar una regex en base a los ejemplos generados por esta
+	 * si el regex generado por el usuario es valido para cada ejemplo gana el juego, de lo contrario si
+	 * logra acertar unicamente 4 ejemplos se agregara al arreglo de mejores jugadores del juego.
+	 * Se verifica cada ejemplo del juego con el regex generado por el participante, si el regex es valido
+	 * para todos los ejemplos retorna un true y se le añade una notificacion al usuario creador del juego y 
+	 * se borra el juego completado, de lo contrario se suma uno al contador de intentos del juego
+	 * 
+	 * 
+	 * @param numGame :numero del juego a completar
+	 * @param nameUser :Usuario participante
+	 * @param solution : solucion generada por el usuario
+	 * @return True: si el juego se completa, False: si el juego falla
+	 * @throws IOException 
+	 * @throws InterruptedException 
+	 */
+	public boolean IsCorrectMode2(String numGame, String nameUser, String solution) throws InterruptedException, IOException{
 		Game gameTested=getGame(numGame);
-		if(gameTested!=null){
+		if(gameTested!=null&regex.IsARegex(solution)){
 			if(gameTested.validateSolution(solution)==5){
 				DeleteGame(numGame);
 				SetNotify(numGame,nameUser,"2",solution);
+				arduino.writeData(nameUser, 3);
 				return true;
 			}
 			if(gameTested.validateSolution(solution)==4){
 				getGame(numGame).addPlayers(nameUser);
 				getGame(numGame).plusAttempts();
+				arduino.writeData(nameUser, 2);
 				return false;
 			}
 			else{
 				getGame(numGame).plusAttempts();
+				arduino.writeData(nameUser, 2);
 				return false;
 			}
 		}
 		return false;
 	}
 	
-	public User getUser(String userName){
+	/**
+	 * retorna el User asociado al nombre de usuario solicitado
+	 * @param userName :nombre de usuario que se desea
+	 * @return User
+	 */
+	private User getUser(String userName){
 		for(int i=0; i<users.size();i++){
 			if(users.get(i).getName()==userName){
 				return users.get(i);
@@ -148,10 +247,23 @@ public class Foo {
 		return null;
 	}
 	
-	public void newUser(String userName){
+	/**
+	 * Crea un nuevo usuario y lo agrega a la lista de usuarios y actualiza el archivo en disco
+	 * 
+	 * @param userName
+	 */
+	private void newUser(String userName){
 		users.add(new User(userName));
+		SaveUsers();
 	}
 	
+	/**
+	 * Cuando se conecta un nuevo usuario, este tiene un nombre asociado, si el usuario no existe
+	 * se cra uno nuevo y retorna un string vacio, si ya existe se verifica si tiene mensajes pendientes 
+	 * y retorna un string con los mensajes que tiene, si no retorna un string de "no mensajes"
+	 * @param userName :usuario conectado
+	 * @return String vacio si se crea un nuevo usuario, mensajes si tiene mensajes, "no message" si no hay mensajes
+	 */
 	public String connectedUser(String userName){
 		User cUser = getUser(userName);
 		if(cUser!=null){
@@ -165,11 +277,24 @@ public class Foo {
 		return "";
 	}
 	
+	/**
+	 * Solicitud de cambio de soluciones de un juego
+	 * Retorna una clase soluciones con el cambio ya realizado
+	 * @param Sol :Clase soluciones que aporta el id del juego y el cambio que se desea hacer
+	 * @return
+	 */
 	public Soluciones changeExample(Soluciones Sol){
 		getGame(Sol.getIdGame()).changeExample(Sol);
 		return getGame(Sol.getIdGame()).getExamples();
 		
 	}
+
+	public Game askGame(String numGame, String userName) throws InterruptedException, IOException{
+		arduino.writeData(userName, 1);
+		return getGame(numGame);
+		
+	}
+	
 }
 	
 	

@@ -1,0 +1,3 @@
+{"name":"Astorga","notify":false,"messages":[]}
+{"name":"Astorga","notify":false,"messages":[]}
+{"name":"Astorga","notify":true,"messages":["Un juego tuyo a sido terminado"]}

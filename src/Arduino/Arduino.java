@@ -1,3 +1,4 @@
+package Arduino;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -105,6 +106,7 @@ public class Arduino implements SerialPortEventListener {
 	}
 	
 	public synchronized void writeData(String data, int code) throws InterruptedException, IOException {
+		initialize();
 		String resultado = "";
 		
 		Thread t=new Thread() {
@@ -116,22 +118,28 @@ public class Arduino implements SerialPortEventListener {
 		t.sleep(3000);
 		
 		switch(code){
-		case 1:
-			resultado = "El jugador " + data + " ha entrado al juego.";
-			output.write(1);
-			output.write(resultado.getBytes());
-			break;
-		case 2:
-			resultado = "El jugador " + data + " ha perdido.";
-			output.write(2);
-	        output.write(resultado.getBytes());
-	        break;
-		case 3:
-			resultado = "El jugador " + data + " ha ganado el juego!";
-			output.write(3);
-			output.write(resultado.getBytes());
-			break;
+			case 1:
+				resultado = "El jugador " + data + " ha entrado al juego.";
+				output.write(1);
+				output.write(resultado.getBytes());
+				break;
+			case 2:
+				resultado = "El jugador " + data + " ha perdido.";
+				output.write(2);
+		        output.write(resultado.getBytes());
+		        break;
+			case 3:
+				resultado = "El jugador " + data + " ha ganado el juego!";
+				output.write(3);
+				output.write(resultado.getBytes());
+				break;
+			case 4:
+				resultado = "El jugador " + data + " ha creado un juego!";
+				output.write(4);
+				output.write(resultado.getBytes());
+				break;
 	    }
+		close();
 		
 	}
 }
