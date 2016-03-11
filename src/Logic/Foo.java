@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import Arduino.Arduino; 
+
+
 public class Foo {
 	private Arduino arduino=new Arduino();
 	private Regex regex=new Regex();
@@ -32,9 +34,9 @@ public class Foo {
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
-	public Boolean NewGame(String creator, String pattern) throws InterruptedException, IOException{
+	public boolean NewGame(String creator, String pattern) throws InterruptedException, IOException{
 		if(regex.IsARegex(pattern)){
-			arduino.writeData(creator, 4);
+			//arduino.writeData(creator, 4);
 			games.add(new Game(creator,pattern));
 			SaveGames();
 		return true;
@@ -43,15 +45,15 @@ public class Foo {
 	}
 	
 	/**
-	 * Una vez que el juego se crea este tiene un numero unico
-	 * para eliminar el juego de la lista de juegos se inserta ese numero
+	 * Una vez que el juego se crea este tiene un numero unico,
+	 * para eliminar el juego se inserta ese numero
 	 * Actualiza el archivo en disco.
 	 * 
 	 * @param number :numero asociado al juego que se desea eliminar
 	 */
-	private void DeleteGame(String number){
+	public void DeleteGame(String number){
 		for(int i=0;i<games.size();i++){
-			if(number==games.get(i).getNumber()){
+			if(games.get(i).getNumber().equals(number)){
 				games.remove(i);
 				SaveGames();
 				break;
@@ -131,8 +133,9 @@ public class Foo {
 	 * @return Retorna el Game, asociado al numGame solicitado, para usar posteriormente
 	 */
 	private Game getGame(String numGame){
+		
 		for(int i=0; i<games.size();i++){
-			if(games.get(i).getNumber()==numGame){
+			if(games.get(i).getNumber().equals(numGame)){
 				return games.get(i);
 			}
 		}
@@ -162,18 +165,21 @@ public class Foo {
 		Game gameTested=getGame(numGame);
 		if(gameTested!=null){
 			for(int i=0;i<5;i++){
-				String conca=solutions[i] + gameTested.getExamples().getSoluciones()[i];
+				String conca= gameTested.getExamples().getSoluciones()[i]+solutions[i];
+				System.out.println(conca);
 				if(regex.Validate(gameTested.getPattern(), conca)){}
 				else{
-					arduino.writeData(nameUser, 2);
+					//arduino.writeData(nameUser, 2);
 					gameTested.plusAttempts();
+					SaveGames();
 					return false;
 				}
 				
 			}
-			arduino.writeData(nameUser, 3);
-			DeleteGame(numGame);
+			//arduino.writeData(nameUser, 3);
+			
 			SetNotify(numGame,nameUser,"1",Arrays.toString(solutions));
+			DeleteGame(numGame);
 			return true;
 			
 		}
@@ -188,9 +194,10 @@ public class Foo {
 	 * @param solution :Solucion(es) que uso el jugador para completar el juego
 	 */
 	private void SetNotify(String numGame, String nameUser, String metodo, String solution) {
-		String message= "El juego #"+numGame+ "fue solucionado por "+nameUser+"mediante el metodo "+metodo+
+		String message= "El juego #"+numGame + " fue solucionado por "+nameUser+" mediante el metodo "+metodo+
 				" y la(s) solucion(es): " +solution+".";
 		getUser(getGame(numGame).getCreator()).AddMessage(message);
+		SaveUsers();
 	}
 
 	/**
@@ -213,20 +220,22 @@ public class Foo {
 		Game gameTested=getGame(numGame);
 		if(gameTested!=null&regex.IsARegex(solution)){
 			if(gameTested.validateSolution(solution)==5){
-				DeleteGame(numGame);
 				SetNotify(numGame,nameUser,"2",solution);
-				arduino.writeData(nameUser, 3);
+				DeleteGame(numGame);
+				//arduino.writeData(nameUser, 3);
 				return true;
 			}
 			if(gameTested.validateSolution(solution)==4){
 				getGame(numGame).addPlayers(nameUser);
 				getGame(numGame).plusAttempts();
-				arduino.writeData(nameUser, 2);
+				SaveGames();
+				//arduino.writeData(nameUser, 2);
 				return false;
 			}
 			else{
 				getGame(numGame).plusAttempts();
-				arduino.writeData(nameUser, 2);
+				SaveGames();
+				//arduino.writeData(nameUser, 2);
 				return false;
 			}
 		}
@@ -240,7 +249,7 @@ public class Foo {
 	 */
 	private User getUser(String userName){
 		for(int i=0; i<users.size();i++){
-			if(users.get(i).getName()==userName){
+			if(users.get(i).getName().equals(userName)){
 				return users.get(i);
 			}
 		}
@@ -267,16 +276,30 @@ public class Foo {
 	public String connectedUser(String userName){
 		User cUser = getUser(userName);
 		if(cUser!=null){
-			if(cUser.HaveMessages()){
-				getUser(userName).setNotify(false);
-				return userFile.getGson().toJson(cUser.getMessages());
-			}
-			return "no message";
+			return UserNotifications(userName);
 		}
 		newUser(userName);
 		return "";
 	}
 	
+	/**
+	 * Retorna las notificaciones del usuario solicitado, retorna "no message" en caso de
+	 * que no tenga mensajes
+	 * @param userName :usuario a consultar por mensajes
+	 * @return String 
+	 */
+	private String UserNotifications(String userName) {
+		User cUser = getUser(userName);
+		if(cUser.HaveMessages()){
+			getUser(userName).setNotify(false);
+			String[] retorno = cUser.getMessages();
+			SaveUsers();
+			return userFile.getGson().toJson(retorno);
+		}
+		return "no message";
+		
+	}
+
 	/**
 	 * Solicitud de cambio de soluciones de un juego
 	 * Retorna una clase soluciones con el cambio ya realizado
@@ -284,13 +307,22 @@ public class Foo {
 	 * @return
 	 */
 	public Soluciones changeExample(Soluciones Sol){
+		if(getGame(Sol.getIdGame())==null){}
 		getGame(Sol.getIdGame()).changeExample(Sol);
 		return getGame(Sol.getIdGame()).getExamples();
 		
 	}
 
+	/**
+	 * Solicita un juego ya creado anteriormente para ser jugado
+	 * @param numGame :numero del juego a utilizar
+	 * @param userName :Jugador que solicita el juego
+	 * @return Game :retorna objeto juego para ser usado
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
 	public Game askGame(String numGame, String userName) throws InterruptedException, IOException{
-		arduino.writeData(userName, 1);
+		//arduino.writeData(userName, 1);
 		return getGame(numGame);
 		
 	}

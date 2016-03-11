@@ -7,19 +7,20 @@ public class Game {
 	private String pattern;
 	private String time;
 	private String creator="";
-	private String number="0";
+	private String idGame="0";
 	private int attempts=0;
-	private Soluciones examples=new Soluciones();
+	private Soluciones examples=new Soluciones(idGame, new String[5]);
 	private String[] bestplayers= {"","","","",""};
 	private Regex regex= new Regex();
 	
-	public Game(String pattern,String time,String creator,String number,int attempts, Soluciones examples,String[] bestplayers){
+	public Game(String pattern,String time,String creator,String idGame,int attempts, Soluciones examples,String[] bestplayers){
 		this.pattern=pattern;
 		this.time=time;
 		this.creator=creator;
-		this.number=number;
+		this.idGame=idGame;
 		this.attempts=attempts;
 		this.examples =examples;
+		examples.setIdGame(idGame);
 		this.bestplayers=bestplayers;
 	}
 	
@@ -28,7 +29,7 @@ public class Game {
 		this.time = Calendar.getInstance().getTime().toString();
 		this.creator=creator;
 		generateExamples();
-		this.number=generateNumber();
+		this.idGame=generateNumber();
 		
 	}
 	
@@ -49,7 +50,7 @@ public class Game {
 		}
 		
 		examples.setSoluciones(change);
-		Soluciones.noCambio();
+		examples.noCambiar();
 		return examples;
 	}
 	
@@ -119,7 +120,7 @@ public class Game {
 	}
 
 	public String getNumber() {
-		return number;
+		return idGame;
 	}
 
 	public int getAttempts() {

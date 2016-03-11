@@ -1,29 +1,44 @@
 package Logic;
 
 public class Soluciones {
-
-	public String[] getSoluciones(){
-		return null;
-		
+	private String idGame;
+	private String[] soluciones;
+	private boolean[] cambios;
+	
+	public Soluciones(String id, String[] soluciones) {
+		idGame = id;
+		this.soluciones = soluciones;
+		cambios = new boolean[5];
+		noCambiar();
+	}
+	
+	public void noCambiar() {
+		for (boolean valor : cambios) {
+			valor = false;
+		}
+	}
+	
+	public String getIdGame() {
+		return idGame;
 	}
 
-	public void setSoluciones(String[] sol) {
-		
+	public void setIdGame(String idGame) {
+		this.idGame = idGame;
+	}
+
+	public String[] getSoluciones() {
+		return soluciones;
+	}
+
+	public void setSoluciones(String[] soluciones) {
+		this.soluciones = soluciones;
 	}
 
 	public boolean[] getCambios() {
-		// TODO Auto-generated method stub
-		return null;
+		return cambios;
 	}
 
-	public static void noCambio() {
-		// TODO Auto-generated method stub
-		
+	public void setCambios(boolean[] cambios) {
+		this.cambios = cambios;
 	}
-
-	public String getIdGame() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
