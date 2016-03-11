@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import Arduino.Arduino; 
+import Arduino.Arduino;
+import Server.Server; 
 
 
 public class Foo {
@@ -14,6 +15,7 @@ public class Foo {
 	private JsonFile gameFile=new JsonFile("games.txt");
 	private List<User> users=new ArrayList<User>();
 	private JsonFile userFile= new JsonFile("users.txt");
+	private Server servidor;
 	
 	/**Constructor
 	 * Carga los juegos y usuarios de los archivos en disco
@@ -23,6 +25,8 @@ public class Foo {
 	public Foo(){
 		LoadGames();
 		LoadUsers();
+		servidor= Server.getInstance();
+		servidor.start();
 	}
 	
 	/**
