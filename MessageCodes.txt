@@ -1,0 +1,5 @@
+Códigos para canalización de paquetes
+
+MessageCode    Función
+   101          Incio de sesión
+   102          
