@@ -1,10 +1,5 @@
 package Logic;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 public class User {
 	
 	private String name;
@@ -18,12 +13,6 @@ public class User {
 		//MakeAListMessage(messages);
 		this.messages=messages;
 		
-	}
-
-	private void MakeAListMessage(String [] array) {
-		for(int i=0;i<array.length;i++){
-			//messages.add(array[i]);
-		}
 	}
 
 	public User(String name){

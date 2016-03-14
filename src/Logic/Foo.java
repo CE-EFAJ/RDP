@@ -17,6 +17,7 @@ public class Foo {
 	private JsonFile userFile= new JsonFile("users.txt");
 	private Server servidor;
 	
+	
 	/**Constructor
 	 * Carga los juegos y usuarios de los archivos en disco
 	 * 
@@ -38,14 +39,15 @@ public class Foo {
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
-	public boolean NewGame(String creator, String pattern) throws InterruptedException, IOException{
+	public Soluciones NewGame(String creator, String pattern){
 		if(regex.IsARegex(pattern)){
 			//arduino.writeData(creator, 4);
-			games.add(new Game(creator,pattern));
+			 Game game=new Game(creator,pattern);
+			games.add(game);
 			SaveGames();
-		return true;
+		return game.getExamples();
 		}
-		return false;
+		return null;
 	}
 	
 	/**
@@ -165,7 +167,7 @@ public class Foo {
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
-	public boolean IsCorrectMode1(String numGame, String nameUser, String[] solutions) throws InterruptedException, IOException{
+	public boolean IsCorrectMode1(String numGame, String nameUser, String[] solutions) {
 		Game gameTested=getGame(numGame);
 		if(gameTested!=null){
 			for(int i=0;i<5;i++){
@@ -220,7 +222,7 @@ public class Foo {
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
-	public boolean IsCorrectMode2(String numGame, String nameUser, String solution) throws InterruptedException, IOException{
+	public boolean IsCorrectMode2(String numGame, String nameUser, String solution){
 		Game gameTested=getGame(numGame);
 		if(gameTested!=null&regex.IsARegex(solution)){
 			if(gameTested.validateSolution(solution)==5){
@@ -271,19 +273,15 @@ public class Foo {
 	}
 	
 	/**
-	 * Cuando se conecta un nuevo usuario, este tiene un nombre asociado, si el usuario no existe
-	 * se cra uno nuevo y retorna un string vacio, si ya existe se verifica si tiene mensajes pendientes 
-	 * y retorna un string con los mensajes que tiene, si no retorna un string de "no mensajes"
 	 * @param userName :usuario conectado
 	 * @return String vacio si se crea un nuevo usuario, mensajes si tiene mensajes, "no message" si no hay mensajes
 	 */
-	public String connectedUser(String userName){
+	public void connectedUser(String userName){
 		User cUser = getUser(userName);
-		if(cUser!=null){
-			return UserNotifications(userName);
+		if(cUser==null){
+			newUser(userName);
 		}
-		newUser(userName);
-		return "";
+		
 	}
 	
 	/**
@@ -292,7 +290,7 @@ public class Foo {
 	 * @param userName :usuario a consultar por mensajes
 	 * @return String 
 	 */
-	private String UserNotifications(String userName) {
+	public String UserNotifications(String userName) {
 		User cUser = getUser(userName);
 		if(cUser.HaveMessages()){
 			getUser(userName).setNotify(false);
@@ -325,10 +323,25 @@ public class Foo {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public Game askGame(String numGame, String userName) throws InterruptedException, IOException{
+	public Game askGame(String numGame, String userName) {
 		//arduino.writeData(userName, 1);
 		return getGame(numGame);
 		
+	}
+	
+	public Game[] getGameList(int index){
+		Game[] gameList= new Game[5];
+		if((index+1)*5==games.size()){
+			for(int i=0;i<5;i++){
+				gameList[i]=games.get(i+(index*5));
+			}
+		}
+		else{
+			for(int i=index;i<games.size();i++){
+				gameList[i-index]=games.get(index);
+			}
+		}
+		return gameList;
 	}
 	
 }

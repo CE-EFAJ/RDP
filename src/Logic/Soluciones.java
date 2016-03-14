@@ -32,6 +32,7 @@ public class Soluciones {
 
 	public void setSoluciones(String[] soluciones) {
 		this.soluciones = soluciones;
+		
 	}
 
 	public boolean[] getCambios() {

@@ -12,9 +12,8 @@ public class Connection extends Thread {
 	private DataInputStream _entrada;
 	private DataOutputStream _salida;
 	private static Server _server;
-	Controller Controlador;
-	private String _msg;
-	boolean _procesado;
+	private Controller ctrl= new Controller();
+	
 
 	public Connection(Socket socket) {
 		try {
@@ -22,6 +21,7 @@ public class Connection extends Thread {
 			_server = Server.getInstance();
 			_salida = null;
 			_entrada = null;
+			
 		} catch (Exception e) {
 		}
 	}
@@ -32,39 +32,25 @@ public class Connection extends Thread {
 			_entrada = new DataInputStream(_cliente.getInputStream());
 
 			_server.addClient(_salida); // Lista enlazada organizacion
-			Controlador= new Controller(this);
-			_procesado=false;
+
 			while (true) {
+				String msg = _entrada.readUTF();
 				
-				//int num = _entrada.readInt();
-				_msg = _entrada.readUTF();
-				
-				//Detener hilo
-				// Procesar Mensaje
-				
-				while(_msg != null) {
-					wait(1);
-					if(_procesado){
-						break;
-					}
+				if (msg == null) {
+					break;
+				} else {
+					
+					System.out.println("Mensaje recibido: " + msg);
+					/*********************************************/
+					String paquete = ctrl.processMessage(msg);
+					_salida.writeUTF(paquete);
+					_salida.flush();
+					/*********************************************/
 				}
-				break;
 			}
 			_cliente.close();
 			_server.removeClient(_salida);
 		} catch (Exception e) {
 		}
-	}
-	
-	public void SendMessage(String message){
-		
-	}
-	
-	public void setProcesado(){
-		_procesado=true;
-	}
-
-	public String getMsg() {
-		return _msg;
 	}
 }

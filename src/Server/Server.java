@@ -1,6 +1,7 @@
 package Server;
 
 import java.io.DataOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -35,6 +36,11 @@ public class Server extends Thread {
 	}
 
 	public void run() {
+		try {
+			System.out.println("IP: " + InetAddress.getLocalHost().toString());
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 		System.out.println("Servidor iniciado en puerto: " +
 				Integer.toString(_port));
 
