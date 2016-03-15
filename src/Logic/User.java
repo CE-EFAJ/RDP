@@ -17,6 +17,7 @@ public class User {
 
 	public User(String name){
 		this.name=name;
+		messages=new String[0];
 	}
 	
 	public String[] getMessages() {

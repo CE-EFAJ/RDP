@@ -1,3 +1,11 @@
 {"name":"Astorga","notify":false,"messages":[]}
 {"name":"Ernesto","notify":false,"messages":[]}
-{"name":"Javier","notify":true,"messages":["El juego #10 fue solucionado por Javier mediante el metodo 1 y la(s) solucion(es): [D, D, D, D, D].","El juego #10 fue solucionado por Javier mediante el metodo 1 y la(s) solucion(es): [D, D, D, D, D].","El juego #10 fue solucionado por Javier mediante el metodo 1 y la(s) solucion(es): [D, D, D, D, D].","El juego #11 fue solucionado por Javier mediante el metodo 2 y la(s) solucion(es): (A*+B*+C*+D*)."]}
+{"name":"Javier","notify":false,"messages":[]}
+{"name":"hola","notify":false,"messages":[]}
+{"name":"playo12","notify":false,"messages":[]}
+{"name":"astorga","notify":false,"messages":[]}
+{"name":"xbfkslsd25","notify":false,"messages":[]}
+{"name":"fabian33","notify":false,"messages":[]}
+{"name":"fabian34","notify":false,"messages":[]}
+{"name":"puta34","notify":false,"messages":[]}
+{"name":"jiulo","notify":false,"messages":[]}

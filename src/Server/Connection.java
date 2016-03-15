@@ -11,14 +11,12 @@ public class Connection extends Thread {
 	private Socket _cliente;
 	private DataInputStream _entrada;
 	private DataOutputStream _salida;
-	private static Server _server;
 	private Controller ctrl= new Controller();
 	
 
 	public Connection(Socket socket) {
 		try {
 			_cliente = socket;
-			_server = Server.getInstance();
 			_salida = null;
 			_entrada = null;
 			
@@ -31,8 +29,6 @@ public class Connection extends Thread {
 			_salida = new DataOutputStream(_cliente.getOutputStream());
 			_entrada = new DataInputStream(_cliente.getInputStream());
 
-			_server.addClient(_salida); // Lista enlazada organizacion
-
 			while (true) {
 				String msg = _entrada.readUTF();
 				
@@ -43,14 +39,15 @@ public class Connection extends Thread {
 					System.out.println("Mensaje recibido: " + msg);
 					/*********************************************/
 					String paquete = ctrl.processMessage(msg);
+					System.out.println(paquete);
 					_salida.writeUTF(paquete);
 					_salida.flush();
 					/*********************************************/
 				}
 			}
 			_cliente.close();
-			_server.removeClient(_salida);
 		} catch (Exception e) {
+			System.out.println(e);
 		}
 	}
 }

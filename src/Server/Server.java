@@ -17,7 +17,7 @@ public class Server extends Thread {
 		if (_singleton != null) {
 			return _singleton;
 		} else {
-			_port = 8080;
+			_port = 7777;
 			_clients = new LinkedList<DataOutputStream>();
 			_singleton = new Server();
 			return _singleton;
@@ -49,9 +49,11 @@ public class Server extends Thread {
 			while (true) {
 				Socket socket = server.accept();
 				System.out.println("Conexion entrante...");
+				
 				new Connection(socket).start();
 			}
 		} catch (Exception e) {
+			System.out.println(e);
 		}
 		System.out.println("Apagando servidor...");
 	}

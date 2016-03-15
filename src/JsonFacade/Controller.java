@@ -11,12 +11,11 @@ import Server.Server;
 
 public class Controller {
 	Gson gson;
-	Server servidor;
-	Foo logic;
+	Foo logic = new Foo();
 	
 	public Controller(){
 		gson= new Gson();
-		logic= new Foo();
+		
 		//processMessage();
 		
 		
@@ -27,12 +26,10 @@ public class Controller {
 		Package paquete = gson.fromJson(json, Package.class);
 		int msgCode=paquete.getMessageCode();
 		String msg=paquete.getMessage();
-		System.out.println(msg);
 		Package sendPack;
 		String sendMsg;
 		Soluciones sol;
 		boolean solution;
-		
 		
 		switch (msgCode) {
 		case 101: //Conexion establecida App: User Server: boolean
@@ -45,7 +42,7 @@ public class Controller {
 			Pattern bean= gson.fromJson(msg, Pattern.class);
 			sol=logic.NewGame(bean._user, bean._patron);
 			if(sol==null){
-				sendPack=new Package(102,"Regex no valido");		
+				sendPack=new Package(102,"error");		
 			}
 			else{
 				sendPack=new Package(102,gson.toJson(sol));

@@ -56,7 +56,6 @@ public class JsonFile {
 	}
 	public void WriteClass(Object object){
 		String json= gson.toJson(object);
-		System.out.println(json);
 		Write(json);
 	}
 	public void Write(String text) {
@@ -82,7 +81,7 @@ public class JsonFile {
 		List<String> lista = new LinkedList<String>();
         try {
 			while((linea=breader.readLine())!=null){
-			   System.out.println(linea);
+			  
 			lista.add(linea);
 			}
 		} catch (IOException e) {

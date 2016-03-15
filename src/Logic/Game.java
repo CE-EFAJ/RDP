@@ -30,6 +30,7 @@ public class Game {
 		this.creator=creator;
 		generateExamples();
 		this.idGame=generateNumber();
+		examples.setIdGame(idGame);
 		
 	}
 	
@@ -39,6 +40,7 @@ public class Game {
 		for(int i=0; i<5;i++){
 		sol[i]= regex.Generator(pattern);}
 		examples.setSoluciones(sol);
+		
 	}
 	
 	public Soluciones changeExample(Soluciones sol){

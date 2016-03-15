@@ -1,5 +1,6 @@
 package Logic;
 import Logic.Foo;
+import Server.Server;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,9 +14,11 @@ import java.lang.reflect.Array;
 public class main {
 
 	public static void main(String[] args) {
-		
+		Server servidor;
 		Foo a= new Foo();
-		Gson gson = new Gson();
+		servidor= Server.getInstance();
+		servidor.start();
+		//Gson gson = new Gson();
 		
 		//System.out.println(gson.toJson(a.askGame("2", "Javier")));
 		//a.NewGame("Javier", "(A+B+C+D)");
@@ -48,5 +51,7 @@ public class main {
 		//System.out.println(Arrays.toString(array));
 				
 		//System.out.println(a.IsCorrectMode2("11", "Javier", "(A*+B*+C*+D*)"));
+		//String[] ger= new String[5];
+		//System.out.println(Arrays.toString(ger));
 	}
 }
